@@ -9,6 +9,7 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { useWallet } from '@lazorkit/wallet-mobile-adapter';
 import { PublicKey, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import * as Linking from 'expo-linking';
@@ -103,12 +104,15 @@ export function WalletScreen({ onDisconnect }: WalletScreenProps) {
 
       <View style={styles.addressSection}>
         <Text style={styles.addressLabel}>Address</Text>
-        <Text style={styles.address}>{shortAddress}</Text>
         <TouchableOpacity
-          onPress={() => Alert.alert('Address', fullAddress)}
+          onPress={async () => {
+            await Clipboard.setStringAsync(fullAddress);
+            Alert.alert('Copied', 'Address copied to clipboard');
+          }}
           activeOpacity={0.6}
         >
-          <Text style={styles.viewFull}>View full address</Text>
+          <Text style={styles.address}>{shortAddress}</Text>
+          <Text style={styles.viewFull}>Tap to copy</Text>
         </TouchableOpacity>
       </View>
 

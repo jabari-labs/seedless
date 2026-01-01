@@ -6,7 +6,14 @@ A React Native (Expo) starter template demonstrating passkey-based wallet authen
 
 **[Download Android APK](https://expo.dev/accounts/solana-bridge/projects/seedless/builds/8c0916af-80c7-4f73-a57c-3a752da5917b)**
 
-Scan the QR code or download directly to test the app.
+## Screenshots
+
+<p align="center">
+  <img src="./assets/screenshots/01-home.png" width="200" alt="Home Screen" />
+  <img src="./assets/screenshots/02-portal.png" width="200" alt="Portal Sign In" />
+  <img src="./assets/screenshots/04-passkey.png" width="200" alt="Passkey Prompt" />
+  <img src="./assets/screenshots/05-wallet.png" width="200" alt="Wallet Screen" />
+</p>
 
 ## Features
 
