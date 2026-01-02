@@ -18,6 +18,7 @@ import { SOLANA_RPC_URL, USDC_MINT } from '../constants';
 
 interface WalletScreenProps {
   onDisconnect: () => void;
+  onSwap?: () => void;
 }
 
 /**
@@ -29,7 +30,7 @@ interface WalletScreenProps {
 // Create connection once
 const connection = new Connection(SOLANA_RPC_URL, 'confirmed');
 
-export function WalletScreen({ onDisconnect }: WalletScreenProps) {
+export function WalletScreen({ onDisconnect, onSwap }: WalletScreenProps) {
   const { smartWalletPubkey, disconnect, signAndSendTransaction, isSigning } = useWallet();
   const [recipient, setRecipient] = useState('');
   const [amount, setAmount] = useState('');
@@ -190,6 +191,14 @@ export function WalletScreen({ onDisconnect }: WalletScreenProps) {
         <Text style={styles.statusText}>Gasless mode</Text>
       </View>
 
+      {/* Swap Button */}
+      {onSwap && (
+        <TouchableOpacity style={styles.swapButton} onPress={onSwap} activeOpacity={0.8}>
+          <Text style={styles.swapButtonText}>Swap Tokens</Text>
+          <Text style={styles.swapButtonSubtext}>SOL ↔ USDC • Gasless</Text>
+        </TouchableOpacity>
+      )}
+
       <View style={styles.divider} />
 
       <View style={styles.formSection}>
@@ -348,6 +357,26 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 14,
     color: '#333',
+  },
+  swapButton: {
+    backgroundColor: '#22c55e',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  swapButtonText: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#fff',
+    textAlign: 'center',
+  },
+  swapButtonSubtext: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.8)',
+    textAlign: 'center',
+    marginTop: 4,
   },
   divider: {
     height: 1,

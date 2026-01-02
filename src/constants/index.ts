@@ -20,3 +20,22 @@ export const FEE_OPTIONS = {
 
 // App deep link scheme for passkey callbacks
 export const APP_SCHEME = 'lazorwallet';
+
+// Jupiter Swap API (not Ultra - we need /swap-instructions for LazorKit compatibility)
+export const JUPITER_API_URL = 'https://api.jup.ag';
+export const JUPITER_API_KEY = '90349292-c128-4906-acf3-0b709e7e0f3b';
+
+// Native SOL mint address (wrapped SOL for Jupiter)
+export const SOL_MINT = 'So11111111111111111111111111111111111111112';
+
+// Token decimals for amount calculations
+export const TOKEN_DECIMALS = {
+  SOL: 9,
+  USDC: 6,
+} as const;
+
+// Slippage in basis points (100 = 1%)
+export const DEFAULT_SLIPPAGE_BPS = 100;
+
+// Compute Budget Program ID - we filter these out for Kora compatibility
+export const COMPUTE_BUDGET_PROGRAM_ID = 'ComputeBudget111111111111111111111111111111';

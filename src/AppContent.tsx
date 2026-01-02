@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useWallet } from '@lazorkit/wallet-mobile-adapter';
 import { HomeScreen } from './screens/HomeScreen';
 import { WalletScreen } from './screens/WalletScreen';
+import { SwapScreen } from './screens/SwapScreen';
+
+type Screen = 'wallet' | 'swap';
 
 /**
  * AppContent - Handles navigation based on wallet connection state
@@ -12,6 +15,7 @@ import { WalletScreen } from './screens/WalletScreen';
  */
 export function AppContent() {
   const { isConnected, isLoading } = useWallet();
+  const [currentScreen, setCurrentScreen] = useState<Screen>('wallet');
 
   // Show loading while checking for persisted session
   if (isLoading) {
@@ -23,7 +27,15 @@ export function AppContent() {
   }
 
   if (isConnected) {
-    return <WalletScreen onDisconnect={() => {}} />;
+    if (currentScreen === 'swap') {
+      return <SwapScreen onBack={() => setCurrentScreen('wallet')} />;
+    }
+    return (
+      <WalletScreen
+        onDisconnect={() => setCurrentScreen('wallet')}
+        onSwap={() => setCurrentScreen('swap')}
+      />
+    );
   }
 
   return <HomeScreen onConnected={() => {}} />;
