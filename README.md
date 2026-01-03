@@ -22,6 +22,7 @@ A React Native (Expo) starter template demonstrating passkey-based wallet authen
 - **Smart Wallet**: PDA-based wallet with recovery and programmable logic
 - **Balance Display**: Real-time SOL and USDC balance with refresh functionality
 - **Jupiter Gasless Swaps**: Swap tokens (SOL ↔ USDC) with zero gas fees using Jupiter aggregator
+- **Private Mode**: Hide balances from shoulder surfers. Requires biometric auth to reveal
 - **Clean Architecture**: Minimal, well-documented code ready to extend
 
 ## Quick Start

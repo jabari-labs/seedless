@@ -10,6 +10,7 @@ import {
   ScrollView,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
+import * as LocalAuthentication from 'expo-local-authentication';
 import { useWallet } from '@lazorkit/wallet-mobile-adapter';
 import { Connection, PublicKey, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { getAccount, getAssociatedTokenAddress } from '@solana/spl-token';
@@ -40,6 +41,37 @@ export function WalletScreen({ onDisconnect, onSwap }: WalletScreenProps) {
   const [solBalance, setSolBalance] = useState<number | null>(null);
   const [usdcBalance, setUsdcBalance] = useState<number | null>(null);
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
+
+  // Privacy state - hides balances from shoulder surfers
+  const [isPrivateMode, setIsPrivateMode] = useState(true); // Default to hidden
+
+  // Toggle privacy mode with biometric auth to reveal
+  const togglePrivacyMode = async () => {
+    if (isPrivateMode) {
+      // Revealing balances - require biometric auth
+      const hasHardware = await LocalAuthentication.hasHardwareAsync();
+      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+      if (!hasHardware || !isEnrolled) {
+        // No biometrics available, just toggle
+        setIsPrivateMode(false);
+        return;
+      }
+
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: 'Authenticate to reveal balances',
+        fallbackLabel: 'Use passcode',
+        cancelLabel: 'Cancel',
+      });
+
+      if (result.success) {
+        setIsPrivateMode(false);
+      }
+    } else {
+      // Hiding balances - no auth needed
+      setIsPrivateMode(true);
+    }
+  };
 
   // Fetch wallet balances
   const fetchBalances = useCallback(async () => {
@@ -166,24 +198,38 @@ export function WalletScreen({ onDisconnect, onSwap }: WalletScreenProps) {
       <View style={styles.balanceSection}>
         <View style={styles.balanceHeader}>
           <Text style={styles.balanceLabel}>Balance</Text>
-          <TouchableOpacity onPress={fetchBalances} disabled={isLoadingBalance}>
-            <Text style={styles.refreshText}>{isLoadingBalance ? 'Loading...' : 'Refresh'}</Text>
-          </TouchableOpacity>
+          <View style={styles.balanceActions}>
+            <TouchableOpacity
+              onPress={togglePrivacyMode}
+              style={styles.privacyToggle}
+            >
+              <Text style={styles.privacyToggleText}>
+                {isPrivateMode ? 'Show' : 'Hide'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={fetchBalances} disabled={isLoadingBalance}>
+              <Text style={styles.refreshText}>{isLoadingBalance ? 'Loading...' : 'Refresh'}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.balanceRow}>
           <Text style={styles.balanceAmount}>
-            {solBalance !== null ? solBalance.toFixed(4) : '—'}
+            {isPrivateMode ? '••••••' : (solBalance !== null ? solBalance.toFixed(4) : '—')}
           </Text>
           <Text style={styles.balanceToken}>SOL</Text>
         </View>
 
         <View style={styles.balanceRow}>
           <Text style={styles.balanceAmountSecondary}>
-            {usdcBalance !== null ? usdcBalance.toFixed(2) : '—'}
+            {isPrivateMode ? '••••••' : (usdcBalance !== null ? usdcBalance.toFixed(2) : '—')}
           </Text>
           <Text style={styles.balanceTokenSecondary}>USDC</Text>
         </View>
+
+        {isPrivateMode && (
+          <Text style={styles.privateModeHint}>Tap "Show" and authenticate to reveal</Text>
+        )}
       </View>
 
       <View style={styles.statusBar}>
@@ -307,9 +353,31 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#999',
   },
+  balanceActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  privacyToggle: {
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    backgroundColor: '#333',
+    borderRadius: 6,
+  },
+  privacyToggleText: {
+    fontSize: 12,
+    color: '#fff',
+    fontWeight: '500',
+  },
   refreshText: {
     fontSize: 13,
     color: '#666',
+  },
+  privateModeHint: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 8,
+    fontStyle: 'italic',
   },
   balanceRow: {
     flexDirection: 'row',
