@@ -20,6 +20,8 @@ import { SOLANA_RPC_URL, USDC_MINT } from '../constants';
 interface WalletScreenProps {
   onDisconnect: () => void;
   onSwap?: () => void;
+  onStealth?: () => void;
+  onBurner?: () => void;
 }
 
 /**
@@ -31,7 +33,7 @@ interface WalletScreenProps {
 // Create connection once
 const connection = new Connection(SOLANA_RPC_URL, 'confirmed');
 
-export function WalletScreen({ onDisconnect, onSwap }: WalletScreenProps) {
+export function WalletScreen({ onDisconnect, onSwap, onStealth, onBurner }: WalletScreenProps) {
   const { smartWalletPubkey, disconnect, signAndSendTransaction, isSigning } = useWallet();
   const [recipient, setRecipient] = useState('');
   const [amount, setAmount] = useState('');
@@ -241,9 +243,28 @@ export function WalletScreen({ onDisconnect, onSwap }: WalletScreenProps) {
       {onSwap && (
         <TouchableOpacity style={styles.swapButton} onPress={onSwap} activeOpacity={0.8}>
           <Text style={styles.swapButtonText}>Swap Tokens</Text>
-          <Text style={styles.swapButtonSubtext}>SOL ↔ USDC • Gasless</Text>
+          <Text style={styles.swapButtonSubtext}>SOL - USDC - Gasless</Text>
         </TouchableOpacity>
       )}
+
+      {/* Privacy Features */}
+      <View style={styles.privacySection}>
+        <Text style={styles.privacySectionTitle}>Privacy Features</Text>
+        <View style={styles.privacyButtons}>
+          {onStealth && (
+            <TouchableOpacity style={styles.privacyButton} onPress={onStealth} activeOpacity={0.8}>
+              <Text style={styles.privacyButtonText}>Stealth</Text>
+              <Text style={styles.privacyButtonSub}>Private receiving</Text>
+            </TouchableOpacity>
+          )}
+          {onBurner && (
+            <TouchableOpacity style={styles.privacyButton} onPress={onBurner} activeOpacity={0.8}>
+              <Text style={styles.privacyButtonText}>Burners</Text>
+              <Text style={styles.privacyButtonSub}>Isolated wallets</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
 
       <View style={styles.divider} />
 
@@ -505,5 +526,35 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginBottom: 8,
+  },
+  privacySection: {
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  privacySectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#000',
+    marginBottom: 12,
+  },
+  privacyButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  privacyButton: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 12,
+    padding: 16,
+  },
+  privacyButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#000',
+  },
+  privacyButtonSub: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 4,
   },
 });

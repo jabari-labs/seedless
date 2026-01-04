@@ -4,15 +4,15 @@ import { useWallet } from '@lazorkit/wallet-mobile-adapter';
 import { HomeScreen } from './screens/HomeScreen';
 import { WalletScreen } from './screens/WalletScreen';
 import { SwapScreen } from './screens/SwapScreen';
+import { StealthScreen } from './screens/StealthScreen';
+import { BurnerScreen } from './screens/BurnerScreen';
 
-type Screen = 'wallet' | 'swap';
+type Screen = 'wallet' | 'swap' | 'stealth' | 'burner';
 
-/**
- * AppContent - Handles navigation based on wallet connection state
- *
- * Uses the hook's isConnected state for persistence across app restarts.
- * When user reconnects, the session is automatically restored.
- */
+// AppContent - Handles navigation based on wallet connection state
+// Uses the hook's isConnected state for persistence across app restarts
+// When user reconnects, the session is automatically restored
+
 export function AppContent() {
   const { isConnected, isLoading } = useWallet();
   const [currentScreen, setCurrentScreen] = useState<Screen>('wallet');
@@ -27,18 +27,26 @@ export function AppContent() {
   }
 
   if (isConnected) {
-    if (currentScreen === 'swap') {
-      return <SwapScreen onBack={() => setCurrentScreen('wallet')} />;
+    switch (currentScreen) {
+      case 'swap':
+        return <SwapScreen onBack={() => setCurrentScreen('wallet')} />;
+      case 'stealth':
+        return <StealthScreen onBack={() => setCurrentScreen('wallet')} />;
+      case 'burner':
+        return <BurnerScreen onBack={() => setCurrentScreen('wallet')} />;
+      default:
+        return (
+          <WalletScreen
+            onDisconnect={() => setCurrentScreen('wallet')}
+            onSwap={() => setCurrentScreen('swap')}
+            onStealth={() => setCurrentScreen('stealth')}
+            onBurner={() => setCurrentScreen('burner')}
+          />
+        );
     }
-    return (
-      <WalletScreen
-        onDisconnect={() => setCurrentScreen('wallet')}
-        onSwap={() => setCurrentScreen('swap')}
-      />
-    );
   }
 
-  return <HomeScreen onConnected={() => {}} />;
+  return <HomeScreen onConnected={() => { }} />;
 }
 
 const styles = StyleSheet.create({
@@ -49,3 +57,4 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
 });
+

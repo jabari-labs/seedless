@@ -21,8 +21,10 @@ A React Native (Expo) starter template demonstrating passkey-based wallet authen
 - **Gasless Transactions**: Send SOL without holding any for fees. Kora paymaster sponsors transactions
 - **Smart Wallet**: PDA-based wallet with recovery and programmable logic
 - **Balance Display**: Real-time SOL and USDC balance with refresh functionality
-- **Jupiter Gasless Swaps**: Swap tokens (SOL ↔ USDC) with zero gas fees using Jupiter aggregator
+- **Jupiter Gasless Swaps**: Swap tokens (SOL - USDC) with zero gas fees using Jupiter aggregator
 - **Private Mode**: Hide balances from shoulder surfers. Requires biometric auth to reveal
+- **Stealth Addresses**: One-time receiving addresses for private payments with Solana Pay QR codes
+- **Burner Wallets**: Completely isolated disposable identities with zero on-chain link
 - **Clean Architecture**: Minimal, well-documented code ready to extend
 
 ## Quick Start
@@ -75,13 +77,19 @@ lazor-wallet-starter/
 │   ├── screens/            # App screens
 │   │   ├── HomeScreen.tsx  # Passkey connect screen
 │   │   ├── WalletScreen.tsx # Wallet, balance, and transfer screen
-│   │   └── SwapScreen.tsx  # Jupiter gasless swap screen
+│   │   ├── SwapScreen.tsx  # Jupiter gasless swap screen
+│   │   ├── StealthScreen.tsx # Stealth address management
+│   │   └── BurnerScreen.tsx  # Burner wallet management
 │   └── utils/              # Utility functions
-│       └── jupiter.ts      # Jupiter swap integration
+│       ├── jupiter.ts      # Jupiter swap integration
+│       ├── stealth.ts      # Stealth address cryptography
+│       ├── paymentRequest.ts # Solana Pay URL generation
+│       └── burner.ts       # Burner wallet management
 └── docs/
     ├── tutorial-1-passkey-wallet.md
     ├── tutorial-2-gasless-transactions.md
-    └── tutorial-3-jupiter-gasless-swaps.md
+    ├── tutorial-3-jupiter-gasless-swaps.md
+    └── tutorial-4-privacy-features.md
 ```
 
 ## Configuration
