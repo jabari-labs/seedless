@@ -18,7 +18,6 @@ import {
     X402_LIMITS,
     formatPaymentAmount,
     createPaymentInstruction,
-    createPaymentHeader,
 } from '../utils/x402';
 
 interface PaywallScreenProps {

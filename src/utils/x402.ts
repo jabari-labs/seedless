@@ -2,7 +2,6 @@
 // Implements the client side of the X402 protocol on Solana
 
 import { PublicKey, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { USDC_MINT, SOLANA_RPC_URL } from '../constants';
 
 // Types matching X402 protocol spec
 export interface PaymentRequirements {
