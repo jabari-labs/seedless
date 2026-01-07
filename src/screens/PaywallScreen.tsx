@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     View,
     Text,
@@ -9,6 +9,7 @@ import {
     ActivityIndicator,
     Alert,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useWallet } from '@lazorkit/wallet-mobile-adapter';
 import * as Linking from 'expo-linking';
 
@@ -20,6 +21,8 @@ import {
     createPaymentInstruction,
 } from '../utils/x402';
 import { CLUSTER_SIMULATION, IS_DEVNET } from '../constants';
+
+const PAID_CONTENT_KEY = 'x402_paid_content_ids';
 
 interface PaywallScreenProps {
     onBack: () => void;
@@ -33,6 +36,41 @@ export function PaywallScreen({ onBack }: PaywallScreenProps) {
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [showContentModal, setShowContentModal] = useState(false);
     const [isPaying, setIsPaying] = useState(false);
+
+    // Load paid content IDs from storage on mount
+    useEffect(() => {
+        const loadPaidContent = async () => {
+            try {
+                const paidIdsJson = await AsyncStorage.getItem(PAID_CONTENT_KEY);
+                if (paidIdsJson) {
+                    const paidIds: string[] = JSON.parse(paidIdsJson);
+                    setContent(prev =>
+                        prev.map(c => ({
+                            ...c,
+                            isPaid: paidIds.includes(c.id),
+                        }))
+                    );
+                }
+            } catch (error) {
+                console.error('Failed to load paid content:', error);
+            }
+        };
+        loadPaidContent();
+    }, []);
+
+    // Save paid content ID to storage
+    const savePaidContent = useCallback(async (itemId: string) => {
+        try {
+            const paidIdsJson = await AsyncStorage.getItem(PAID_CONTENT_KEY);
+            const paidIds: string[] = paidIdsJson ? JSON.parse(paidIdsJson) : [];
+            if (!paidIds.includes(itemId)) {
+                paidIds.push(itemId);
+                await AsyncStorage.setItem(PAID_CONTENT_KEY, JSON.stringify(paidIds));
+            }
+        } catch (error) {
+            console.error('Failed to save paid content:', error);
+        }
+    }, []);
 
     const handleContentPress = (item: ContentItem) => {
         if (item.isPaid) {
@@ -58,13 +96,14 @@ export function PaywallScreen({ onBack }: PaywallScreenProps) {
 
         setIsPaying(true);
 
-        // Helper to unlock content
+        // Helper to unlock content and persist
         const unlockContent = () => {
             setContent(prev =>
                 prev.map(c =>
                     c.id === itemId ? { ...c, isPaid: true } : c
                 )
             );
+            savePaidContent(itemId); // Persist to storage
             setShowPaymentModal(false);
             setShowContentModal(true);
         };
